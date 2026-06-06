@@ -76,7 +76,7 @@ RFI flagging is perfomed using aNKflag.
 
 and cite the following papers.
 
-2. [aNKflag paper: Kansabanik et al., ApJs 2023] [kansabanik2023]
+2. [aNKflag paper: Kansabanik et al., ApJS 2023][kansabanik2023]
 
 [Kansabanik2023]: https://doi.org/10.3847/1538-4365/acac79
 
