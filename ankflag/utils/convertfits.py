@@ -312,7 +312,7 @@ def baselinesfrombinary(ANTS, data, scratchdir, flagparams, verbose=False):
             temp00 = np.zeros(np.shape(temparr), dtype="float32")
             for p in range(0, flagparams["Npols"]):
                 for d in range(2, 3):
-                    if baselineflag[scan * nbase + bline, 2 + p]:
+                    if baselineflag[scan * nbase + bline, 3] or baselineflag[scan * nbase + bline, 4]:
                         for l in range(0, len(recids)):
                             np.copyto(
                                 scdata.data[recids[l], 0, 0, 0, :, p, d],
