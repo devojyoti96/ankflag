@@ -44,7 +44,7 @@ aNKflag documentation is available at: [ankflag.readthedocs.io]
    pip install ankflag
    ```
 
-3. Initiate necessary metadata
+3. Initiate necessary metadata and containers
 
     ```text
     run-ankflag init --datadir </full/path/to/data/directory>
