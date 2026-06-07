@@ -348,7 +348,7 @@ def flagautocorr(ANTS, data):
     return nbase
 
 
-def flagchanlist(ANTS, data, hopelesschans):
+def flagchanlist(data, hopelesschans):
     """
     Function to flag a list of channels in all baselines
     """
@@ -358,8 +358,8 @@ def flagchanlist(ANTS, data, hopelesschans):
         nchan = data.data.shape[4]
         for hc in hopelesschans:
             if hc < nchan:
-                data.data[:, :, :, :, hc, :, 2] = -np.abs(
-                    data.data[:, :, :, :, hc, :, 2]
+                data.data[:, :, :, :, hc, :, :] = -np.abs(
+                    data.data[:, :, :, :, hc, :, :]
                 )
     else:
         print("No bad channels to flag")

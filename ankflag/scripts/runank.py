@@ -93,12 +93,6 @@ def cli():
         default=None,
     )
     flag_args.add_argument(
-        "--rfifreqfile",
-        help="File with RFI frequencies",
-        type=str,
-        default=None,
-    )
-    flag_args.add_argument(
         "--flagautocorr",
         help="Flag autocorrelations",
         action="store_true",
@@ -253,12 +247,6 @@ def cli():
             else:
                 infile = fits.open(infilefits)
             data = infile[0].data
-
-            if (args.rfifreqfile != None) and os.path.exists(args.rfifreqfile):
-                # 	-----------	Flagging hopeless channels	---------------------------
-                print("Identifying bad channels from ", args.rfifreqfile)
-            else:
-                print("No bad channel list found... continuing...")
 
             if args.flagmode == "uvbin":
                 uvfitstobinary(
