@@ -74,7 +74,7 @@ def uvfitstobinary(
             if savefig:
                 plt.plot(vgridarr[:, 0], vgridarr[:, 1], colsel, markersize=0.5)
             vstart = vstop
-            ustart = ustop
+        ustart = ustop
     if savefig:
         plt.xlabel("U")
         plt.ylabel("V")
@@ -342,9 +342,8 @@ def flagautocorr(ANTS, data):
     print("Flagging %d auto-correlations..." % nbase)
     for bline in range(0, len(data.par("BASELINE"))):
         if np.isin(data.par("BASELINE")[bline], blid):
-            data[bline].data[:, :, :, :, :, 2] = -np.abs(
-                data[bline].data[:, :, :, :, :, 2]
-            )
+            data[bline].data[:, :, :, :, :, 2] = 0
+    print ("Auto-correlation flagging is done.")
     return nbase
 
 
@@ -358,9 +357,7 @@ def flagchanlist(data, hopelesschans):
         nchan = data.data.shape[4]
         for hc in hopelesschans:
             if hc < nchan:
-                data.data[:, :, :, :, hc, :, :] = -np.abs(
-                    data.data[:, :, :, :, hc, :, :]
-                )
+                data.data[:, :, :, :, hc, :, :] = 0
     else:
         print("No bad channels to flag")
     return nhopeless

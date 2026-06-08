@@ -1,4 +1,6 @@
-import os, sys
+import os
+import sys
+import gc
 import numpy as np
 import time as tm
 import argparse as ap
@@ -9,6 +11,7 @@ from ankflag.utils.inputs import *
 from ankflag.utils.plottingfns import *
 from ankflag.utils.ankdata import init_ankflag_data
 from ankflag.utils.udocker_utils import initialize_ankflag_container, run_ankflag
+from ankflag.utils.resource_utils import drop_cache
 
 # This script is written by Apurba bera
 # Formatted and udocker contanierisation is done by Devojyoti Kansabanik
@@ -233,7 +236,7 @@ def cli():
 
         if args.flagautocorr:
             # 	Preflag autocorrelations
-            infile = fits.open(infilefits)
+            infile = fits.open(infilefits, memmap=True)
             data = infile[0].data
             nauto = flagautocorr(flagparams["N_ants"], data)
             infile.writeto(
@@ -243,9 +246,9 @@ def cli():
 
         if ConvertFITS:
             if args.flagautocorr:
-                infile = fits.open(scratchdir + "/scratchfits.fits")
+                infile = fits.open(scratchdir + "/scratchfits.fits", memmap=True)
             else:
-                infile = fits.open(infilefits)
+                infile = fits.open(infilefits, memmap=True)
             data = infile[0].data
 
             if args.flagmode == "uvbin":
@@ -271,6 +274,8 @@ def cli():
                 print("Unknown flagging mode !!! ........")
 
             infile.close()
+            del data
+            gc.collect()
             print("Convertion done in %d seconds" % (tm.time() - start0))
 
         # 	----------------------------
@@ -280,6 +285,7 @@ def cli():
         start1 = tm.time()
 
         if DoFlag:
+            print("Starting aNKflag...")
             status = run_ankflag(
                 scratchdir,
                 args.logfile,
@@ -295,7 +301,7 @@ def cli():
         # 	---------------------------------
         if ReadBack:
             if args.flagautocorr:
-                infile2 = fits.open(scratchdir + "/scratchfits.fits")
+                infile2 = fits.open(scratchdir + "/scratchfits.fits", memmap=True)
             else:
                 infile2 = fits.open(infilefits)
             data2 = infile2[0].data
@@ -316,7 +322,12 @@ def cli():
                 infile2.writeto(outfilefits, output_verify="warn", overwrite=True)
 
             infile2.close()
+            del data2
+            gc.collect()
             print("Everything done in %d seconds" % (tm.time() - start0))
+            drop_cache(os.path.dirname(infilefits))
+            drop_cache(os.path.dirname(outfilefits))
+            drop_cache(scratchdir)
 
         if args.clearscratch:
             print("Clearing scratch directory....")
