@@ -1,4 +1,5 @@
 import sys
+import gc
 import numpy as np
 from astropy.io import fits
 import matplotlib.pyplot as plt
@@ -39,6 +40,8 @@ def uvfitstobinary(
     uvwarrus = uvwarr[usorted]
     recdataus = data[usorted]
     recidus = recids[usorted]
+    del uvwarr, recids, data
+    gc.collect()
     uvbins = []
     ustart = 0
     uglen = 1 + int(ngroups / ugrids)
@@ -68,6 +71,8 @@ def uvfitstobinary(
             vrecdata = urecvs[vstart:vstop]
             vrecid = urecidvs[vstart:vstop]
             uvbins.append([ug, vg, vrecdata, vrecid])
+            del vrecdata, vrecid
+            gc.collect()
             colsel = "b."
             if (ug + vg) % 2:
                 colsel = "r."
@@ -111,6 +116,8 @@ def uvfitstobinary(
             fname.close()
     uvbinstats = np.array(uvbinstats)
     np.savetxt(scratchdir + "uvbin_status.txt", uvbinstats, fmt="%4d	%4d	%4d	%4d	%4d")
+    del uvbins, datauvg, datarray
+    gc.collect()
     return
 
 

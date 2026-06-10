@@ -16,6 +16,7 @@ from ankflag.utils.resource_utils import drop_cache
 # This script is written by Apurba bera
 # Formatted and udocker contanierisation is done by Devojyoti Kansabanik
 
+
 def cli():
     parser = ap.ArgumentParser(
         description="aNKflag command line interface"
@@ -125,9 +126,15 @@ def cli():
     )
     adv_args.add_argument(
         "--nthreads",
-        help="Number of threads",
+        help="Number of threads (all threads)",
         type=int,
-        default=1,
+        default=-1,
+    )
+    adv_args.add_argument(
+        "--absmem",
+        help="Memory usuage in GB (all memory)",
+        type=float,
+        default=-1,
     )
     adv_args.add_argument(
         "--clearscratch",
@@ -215,6 +222,23 @@ def cli():
         else:
             uugrids = flagparams["UgridTar"]
             vvgrids = flagparams["VgridTar"]
+            
+        # ---------------------
+        # Estimating file size
+        # ---------------------
+        infile = fits.open(infilefits, memmap=True)
+        data = infile[0].data
+        total_size = round(data.nbytes/1024**3,3) # In GB
+        
+        if args.absmem<total_size:
+            print(f"Minimum required memory for this data: {total_size} GB.")
+            print("Either increase --absmem or split the data before flagging.")
+            return 1
+        
+        nchunks = max(1,int(args.absmem/total_size))
+        args.nthreads = min(nchunks,args.nthreads)
+       
+        print(f"Using number of threads: {args.nthreads}")
 
         #   ------------------------------------------
         # 	Convert parameters to aNKflag secret codes
@@ -233,7 +257,7 @@ def cli():
         # 	------------------------------------------------
 
         start0 = tm.time()
-
+  
         if args.flagautocorr:
             # 	Preflag autocorrelations
             infile = fits.open(infilefits, memmap=True)
@@ -243,6 +267,8 @@ def cli():
                 scratchdir + "/scratchfits.fits", output_verify="warn", overwrite=True
             )
             infile.close()
+            del data
+            gc.collect()
 
         if ConvertFITS:
             if args.flagautocorr:
@@ -332,5 +358,6 @@ def cli():
         if args.clearscratch:
             print("Clearing scratch directory....")
             os.system(f"rm -rf {scratchdir}/*")
+        
         return 0
         
