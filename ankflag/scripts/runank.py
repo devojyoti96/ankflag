@@ -1,6 +1,7 @@
 import os
 import sys
 import gc
+import psutil
 import numpy as np
 import time as tm
 import argparse as ap
@@ -226,6 +227,11 @@ def cli():
         # ---------------------
         # Estimating file size
         # ---------------------
+        if args.nthreads==-1:
+            args.nthreads = max(1,int(0.8*psutil.cpu_count()))
+        if args.absmem==-1:
+            args.absmem = round(0.8*psutil.virtual_memory().total/1024**3,3)
+            
         infile = fits.open(infilefits, memmap=True)
         data = infile[0].data
         total_size = round(data.nbytes/1024**3,3) # In GB
@@ -239,6 +245,7 @@ def cli():
         args.nthreads = min(nchunks,args.nthreads)
        
         print(f"Using number of threads: {args.nthreads}")
+        print(f"Using total memory: {args.absmem} GB")
 
         #   ------------------------------------------
         # 	Convert parameters to aNKflag secret codes

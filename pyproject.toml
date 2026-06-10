@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ankflag"
-version = "3.0.6"
+version = "3.0.7"
 description = "A package to perform RFI flagging of radio interferometric data"
 readme = { file = "README.md", content-type = "text/markdown" }
 license = "MIT"
